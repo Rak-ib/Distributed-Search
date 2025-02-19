@@ -1,0 +1,47 @@
+openapi: 3.0.0
+info:
+  title: Distributed Search API
+  description: API to store and search books across distributed nodes
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000
+
+paths:
+  /books:
+    post:
+      summary: Add a new book
+      description: Store book details in the MongoDB database
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                title:
+                  type: string
+                category:
+                  type: string
+      responses:
+        "201":
+          description: Book added successfully
+        "500":
+          description: Server error
+
+  /search:
+    get:
+      summary: Search books by name
+      description: Search books across distributed nodes by title
+      parameters:
+        - name: title
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Returns books matching the title
+        "500":
+          description: Server error

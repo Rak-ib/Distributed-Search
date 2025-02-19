@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:6.0  # Pin MongoDB version to prevent future breaking changes
+    container_name: mongo-db
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: search-gateway
+    depends_on:
+      - mongo
+      - server1
+      - server2
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://mongo-db:27017/distributed_search
+    ports:
+      - "5000:5000"  # 🔥 Corrected: Exposing port 5000 to match Express app in `server.js`
+
+  server1:
+    build:
+      context: ./server1
+      dockerfile: Dockerfile
+    container_name: search-server1
+    depends_on:
+      - mongo
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://mongo-db:27017/distributed_search
+      - SERVER_ID=1  # Identify this server as Node 1
+    ports:
+      - "4001:4001"
+
+  server2:
+    build:
+      context: ./server2
+      dockerfile: Dockerfile
+    container_name: search-server2
+    depends_on:
+      - mongo
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://mongo-db:27017/distributed_search
+      - SERVER_ID=2  # Identify this server as Node 2
+    ports:
+      - "4002:4002"
+
+volumes:
+  mongo-data:  # Persistent volume for MongoDB storage
