@@ -243,7 +243,7 @@ services:
       "id": 5,
       "title": "Harry Potter",
       "category": "Fantasy",
-      "source": "server1"
+      "searchedBy": "server1"
     }
   ]
 }
